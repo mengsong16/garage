@@ -68,6 +68,7 @@ class WorkerFactory:
         #print('--------Worker factory: initialize--------')
         #print("self seed: %d"%(self._seed) )
         #print('-----------------------------------------')  
+        #print(worker_class)
       
 
     def prepare_worker_messages(self, objs, preprocess=identity_function):
@@ -115,6 +116,8 @@ class WorkerFactory:
         """
         if worker_number >= self.n_workers:
             raise ValueError('Worker number is too big')
+
+        #print('--------here--------')    
         return self._worker_class(worker_number=worker_number,
                                   seed=self._seed,
                                   max_episode_length=self._max_episode_length,

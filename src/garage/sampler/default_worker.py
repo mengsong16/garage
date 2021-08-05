@@ -51,9 +51,13 @@ class DefaultWorker(Worker):
         """Initialize a worker."""
         if self._seed is not None:
             deterministic.set_seed(self._seed + self._worker_number)
-            print("****************************")
-            print("default worker: %d"%(deterministic.get_seed()))
-            print("****************************")
+        else:
+            self._seed = deterministic.get_seed()
+            deterministic.set_seed(self._seed + self._worker_number)
+
+        #print("****************************")
+        #print("default worker: %d"%(deterministic.get_seed()))
+        #print("****************************")    
 
     def update_agent(self, agent_update):
         """Update an agent, assuming it implements :class:`~Policy`.
@@ -89,6 +93,7 @@ class DefaultWorker(Worker):
             TypeError: If env_update is not one of the documented types.
 
         """
+        #print(self._seed + self._worker_number)
         self.env, _ = _apply_env_update(self.env, env_update, self._seed + self._worker_number)
 
     def start_episode(self):

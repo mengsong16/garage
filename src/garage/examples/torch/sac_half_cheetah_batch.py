@@ -70,14 +70,14 @@ def sac_half_cheetah_batch(ctxt=None, seed=1):
               buffer_batch_size=256,
               reward_scale=1.,
               steps_per_epoch=1)
-    
+    '''
     if torch.cuda.is_available():
         set_gpu_mode(True)
     else:
         set_gpu_mode(False)
     sac.to()
-    
-    #set_gpu_mode(False)
+    '''
+    set_gpu_mode(False)
 
     trainer.setup(algo=sac, env=env)
     #trainer.train(n_epochs=1000, batch_size=1000)

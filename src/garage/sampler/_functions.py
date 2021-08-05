@@ -4,7 +4,7 @@ from garage.experiment import deterministic
 from garage.sampler.env_update import EnvUpdate
 
 
-def _apply_env_update(old_env, env_update, seed = deterministic.get_seed()):
+def _apply_env_update(old_env, env_update, seed):
     """Use any non-None env_update as a new environment.
 
     A simple env update function. If env_update is not None, it should be
@@ -36,9 +36,9 @@ def _apply_env_update(old_env, env_update, seed = deterministic.get_seed()):
                 old_env.close()
 
             #seed = deterministic.get_seed()
-            print("****************************")
-            print("functions: %d"%(seed))
-            print("****************************")
+            #print("****************************")
+            #print("functions: %d"%(seed))
+            #print("****************************")
             env_update.seed(seed)    
             return env_update, True
         else:

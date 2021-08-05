@@ -41,10 +41,11 @@ def ppo_pendulum(ctxt=None, seed=1):
                                               hidden_nonlinearity=torch.tanh,
                                               output_nonlinearity=None)
 
+    '''
     sampler = RaySampler(agents=policy,
                          envs=env,
                          max_episode_length=env.spec.max_episode_length)
-
+    
     #print('-------ppo-----')
     #print(get_seed())
     
@@ -53,7 +54,7 @@ def ppo_pendulum(ctxt=None, seed=1):
                            envs=env,
                            max_episode_length=env.spec.max_episode_length,
                            worker_class=FragmentWorker)                     
-    '''
+    
     algo = PPO(env_spec=env.spec,
                policy=policy,
                value_function=value_function,

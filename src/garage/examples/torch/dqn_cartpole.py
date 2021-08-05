@@ -53,8 +53,8 @@ def dqn_cartpole(ctxt=None, seed=24):
     sampler = LocalSampler(agents=exploration_policy,
                            envs=env,
                            max_episode_length=env.spec.max_episode_length,
-                           worker_class=FragmentWorker,
-                           n_workers=1)
+                           worker_class=FragmentWorker)
+                           #n_workers=1)
     algo = DQN(env_spec=env.spec,
                policy=policy,
                qf=qf,

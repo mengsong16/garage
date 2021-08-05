@@ -69,6 +69,7 @@ class RaySampler(Sampler):
                             'parameters (at least max_episode_length)')
         if isinstance(worker_factory, WorkerFactory):
             self._worker_factory = worker_factory
+            #print("------here 1------")
         else:
             self._worker_factory = WorkerFactory(
                 max_episode_length=max_episode_length,
@@ -77,6 +78,8 @@ class RaySampler(Sampler):
                 n_workers=n_workers,
                 worker_class=worker_class,
                 worker_args=worker_args)
+            #print("------here 2------")
+
         self._sampler_worker = ray.remote(SamplerWorker)
         self._agents = agents
         self._envs = self._worker_factory.prepare_worker_messages(envs)
@@ -123,6 +126,8 @@ class RaySampler(Sampler):
                 worker_id, self._envs[worker_id], agent_pkls[worker_id],
                 self._worker_factory)
 
+        print("start_worker")        
+
     def _update_workers(self, agent_update, env_update):
         """Update all of the workers.
 
@@ -149,6 +154,8 @@ class RaySampler(Sampler):
             worker = self._all_workers[worker_id]
             updating_workers.append(
                 worker.update.remote(param_ids[worker_id], env_ids[worker_id]))
+
+        #print("---here")        
         return updating_workers
 
     def obtain_samples(self, itr, num_samples, agent_update, env_update=None):
@@ -179,6 +186,7 @@ class RaySampler(Sampler):
         idle_worker_ids = []
         updating_workers = self._update_workers(agent_update, env_update)
 
+        #print("here ------")
         with click.progressbar(length=num_samples, label='Sampling') as pbar:
             while completed_samples < num_samples:
                 # if there are workers still being updated, check
@@ -344,6 +352,7 @@ class SamplerWorker:
         self.worker_id = worker_id
         self.inner_worker.update_env(env)
         self.inner_worker.update_agent(cloudpickle.loads(agent_pkl))
+        #print('--here')
 
     def update(self, agent_update, env_update):
         """Update the agent and environment.
@@ -356,8 +365,12 @@ class SamplerWorker:
             int: The worker id.
 
         """
+        #print("----here")
         self.inner_worker.update_agent(agent_update)
+        #print("==========here")
+        #exit()
         self.inner_worker.update_env(env_update)
+        #print(self.worker_id)
         return self.worker_id
 
     def rollout(self):

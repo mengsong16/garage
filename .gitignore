@@ -154,3 +154,6 @@ garage/config_personal.py
 sandbox/
 MUJOCO_LOG.TXT
 *.pkl
+
+# data
+garage/src/garage/examples/torch/data

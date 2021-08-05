@@ -4,7 +4,9 @@ import pytest
 from garage.envs import PointEnv
 from garage.experiment.task_sampler import SetTaskSampler
 from garage.np.policies import FixedPolicy
-from garage.sampler import LocalSampler, WorkerFactory
+from garage.sampler import LocalSampler, WorkerFactory, RaySampler
+from garage.envs import GymEnv
+from garage.envs.dm_control import DMControlEnv
 
 
 def test_update_envs_env_update():
@@ -104,6 +106,79 @@ def test_no_seed():
     episodes = sampler.obtain_samples(0, 160, policy)
     assert sum(episodes.lengths) >= 160
 
+def test_deterministic_on_policy_local_sampling_gym_env():
+    max_episode_length = 10
+    env1 = GymEnv('LunarLander-v2')
+    env2 = GymEnv('LunarLander-v2')
+    # Fix the action sequence
+    env1.action_space.seed(10)
+    env2.action_space.seed(10)
+    policy1 = FixedPolicy(env1.spec,
+                          scripted_actions=[
+                              env1.action_space.sample()
+                              for _ in range(max_episode_length)
+                          ])
+    policy2 = FixedPolicy(env2.spec,
+                          scripted_actions=[
+                              env2.action_space.sample()
+                              for _ in range(max_episode_length)
+                          ])
+    n_workers = 2
+    worker1 = WorkerFactory(seed=10,
+                            max_episode_length=max_episode_length,
+                            n_workers=n_workers)
+    worker2 = WorkerFactory(seed=10,
+                            max_episode_length=max_episode_length,
+                            n_workers=n_workers)
+    sampler1 = LocalSampler.from_worker_factory(worker1, policy1, env1)
+    sampler2 = LocalSampler.from_worker_factory(worker2, policy2, env2)
+    episodes1 = sampler1.obtain_samples(10, 100, policy1)
+    episodes2 = sampler2.obtain_samples(10, 100, policy2)
+    assert np.array_equal(episodes1.observations, episodes2.observations)
+    assert np.array_equal(episodes1.next_observations,
+                          episodes2.next_observations)
+
+    print("------------------------------------------------------")
+    print("Succeed: test_deterministic_on_policy_local_sampling_gym_env")                       
+    print("------------------------------------------------------")
+
+
+
+def test_deterministic_on_policy_local_sampling_dm_env():
+    max_episode_length = 10
+    env1 = DMControlEnv.from_suite('cartpole', 'balance')
+    env2 = DMControlEnv.from_suite('cartpole', 'balance')
+    # Fix the action sequence
+    env1.action_space.seed(10)
+    env2.action_space.seed(10)
+    policy1 = FixedPolicy(env1.spec,
+                          scripted_actions=[
+                              env1.action_space.sample()
+                              for _ in range(max_episode_length)
+                          ])
+    policy2 = FixedPolicy(env2.spec,
+                          scripted_actions=[
+                              env2.action_space.sample()
+                              for _ in range(max_episode_length)
+                          ])
+    n_workers = 2
+    worker1 = WorkerFactory(seed=10,
+                            max_episode_length=max_episode_length,
+                            n_workers=n_workers)
+    worker2 = WorkerFactory(seed=10,
+                            max_episode_length=max_episode_length,
+                            n_workers=n_workers)
+    sampler1 = LocalSampler.from_worker_factory(worker1, policy1, env1)
+    sampler2 = LocalSampler.from_worker_factory(worker2, policy2, env2)
+    episodes1 = sampler1.obtain_samples(0, 10, policy1)
+    episodes2 = sampler2.obtain_samples(0, 10, policy2)
+    assert np.array_equal(episodes1.observations, episodes2.observations)
+    assert np.array_equal(episodes1.next_observations,
+                          episodes2.next_observations)
+
+    print("------------------------------------------------------")
+    print("Succeed: test_deterministic_on_policy_local_sampling_dm_env") 
+    print("------------------------------------------------------")                     
 
 def test_init_without_worker_factory():
     max_episode_length = 16
@@ -124,3 +199,7 @@ def test_init_without_worker_factory():
             worker_factory._max_episode_length)
     with pytest.raises(TypeError, match='Must construct a sampler from'):
         LocalSampler(agents=policy, envs=env)
+    
+
+test_deterministic_on_policy_local_sampling_gym_env()
+#test_deterministic_on_policy_local_sampling_dm_env()

@@ -104,7 +104,7 @@ def main(env=None,
 
 
 # pylint: disable=unused-argument
-@wrap_experiment(snapshot_mode='gap_overwrite', snapshot_gap=30)
+@wrap_experiment(snapshot_mode='gap_overwrite', snapshot_gap=30, archive_launch_repo=False)
 def dqn_atari(ctxt=None,
               env=None,
               seed=24,

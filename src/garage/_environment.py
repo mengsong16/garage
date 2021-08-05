@@ -350,9 +350,19 @@ class Environment(abc.ABC):
                              'got render mode {} instead.'.format(
                                  self.render_modes, mode))
 
+    @abc.abstractmethod
+    def seed(self, seed):
+        """Sets environment seeds.
+        This method should set all seeds specific to the environment library.
+        Args:
+            seed (int): The seed value to set
+        """
+
     def __del__(self):
         """Environment destructor."""
         self.close()
+
+        
 
 
 class Wrapper(Environment):

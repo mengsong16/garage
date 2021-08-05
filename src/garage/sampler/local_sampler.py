@@ -59,6 +59,9 @@ class LocalSampler(Sampler):
             n_workers=psutil.cpu_count(logical=False),
             worker_class=DefaultWorker,
             worker_args=None):
+
+        if seed is None:
+            seed = get_seed()     
         # pylint: disable=super-init-not-called
         if worker_factory is None and max_episode_length is None:
             raise TypeError('Must construct a sampler from WorkerFactory or'
@@ -66,6 +69,14 @@ class LocalSampler(Sampler):
         if isinstance(worker_factory, WorkerFactory):
             self._factory = worker_factory
         else:
+            #print("------here-------")
+            #print('--------Local sampler: initialize--------')
+            #print("self seed: %d"%(seed))
+            #print(get_seed())
+            #print(seed)
+            #print(n_workers)
+            #print('-----------------------------------------')
+
             self._factory = WorkerFactory(
                 max_episode_length=max_episode_length,
                 is_tf_worker=is_tf_worker,
@@ -73,6 +84,8 @@ class LocalSampler(Sampler):
                 n_workers=n_workers,
                 worker_class=worker_class,
                 worker_args=worker_args)
+
+               
 
         self._agents = self._factory.prepare_worker_messages(agents)
         self._envs = self._factory.prepare_worker_messages(
@@ -84,6 +97,8 @@ class LocalSampler(Sampler):
             worker.update_agent(agent)
             worker.update_env(env)
         self.total_env_steps = 0
+
+        
 
     @classmethod
     def from_worker_factory(cls, worker_factory, agents, envs):

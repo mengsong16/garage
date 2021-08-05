@@ -57,6 +57,10 @@ class RaySampler(Sampler):
             n_workers=psutil.cpu_count(logical=False),
             worker_class=DefaultWorker,
             worker_args=None):
+
+        if seed is None:
+            seed = get_seed()  
+                
         # pylint: disable=super-init-not-called
         if not ray.is_initialized():
             ray.init(log_to_driver=False, ignore_reinit_error=True)

@@ -7,8 +7,8 @@ import torch
 
 from garage import wrap_experiment
 from garage.envs import GymEnv
-from garage.experiment.deterministic import set_seed
-from garage.sampler import RaySampler
+from garage.experiment.deterministic import set_seed, get_seed
+from garage.sampler import RaySampler, LocalSampler, FragmentWorker
 from garage.torch.algos import PPO
 from garage.torch.policies import GaussianMLPPolicy
 from garage.torch.value_functions import GaussianMLPValueFunction
@@ -45,6 +45,15 @@ def ppo_pendulum(ctxt=None, seed=1):
                          envs=env,
                          max_episode_length=env.spec.max_episode_length)
 
+    #print('-------ppo-----')
+    #print(get_seed())
+    
+    '''
+    sampler = LocalSampler(agents=policy,
+                           envs=env,
+                           max_episode_length=env.spec.max_episode_length,
+                           worker_class=FragmentWorker)                     
+    '''
     algo = PPO(env_spec=env.spec,
                policy=policy,
                value_function=value_function,
@@ -53,7 +62,7 @@ def ppo_pendulum(ctxt=None, seed=1):
                center_adv=False)
 
     trainer.setup(algo, env)
-    trainer.train(n_epochs=100, batch_size=10000)
+    trainer.train(n_epochs=10, batch_size=10000)
 
 
 ppo_pendulum(seed=1)

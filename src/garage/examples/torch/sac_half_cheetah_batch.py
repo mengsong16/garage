@@ -17,7 +17,7 @@ from garage.torch.q_functions import ContinuousMLPQFunction
 from garage.trainer import Trainer
 
 
-@wrap_experiment(snapshot_mode='none')
+@wrap_experiment(snapshot_mode='last')
 def sac_half_cheetah_batch(ctxt=None, seed=1):
     """Set up environment and algorithm and run the task.
 
@@ -70,14 +70,18 @@ def sac_half_cheetah_batch(ctxt=None, seed=1):
               buffer_batch_size=256,
               reward_scale=1.,
               steps_per_epoch=1)
-
+    
     if torch.cuda.is_available():
         set_gpu_mode(True)
     else:
         set_gpu_mode(False)
     sac.to()
+    
+    #set_gpu_mode(False)
+
     trainer.setup(algo=sac, env=env)
-    trainer.train(n_epochs=1000, batch_size=1000)
+    #trainer.train(n_epochs=1000, batch_size=1000)
+    trainer.train(n_epochs=10, batch_size=1000)
 
 
 s = np.random.randint(0, 1000)

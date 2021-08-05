@@ -101,7 +101,7 @@ class VecWorker(DefaultWorker):
         if env_update:
             for env_index, env_up in enumerate(env_update):
                 self._envs[env_index], up = _apply_env_update(
-                    self._envs[env_index], env_up)
+                    self._envs[env_index], env_up, self._seed + self._worker_number)
                 self._needs_env_reset |= up
 
     def start_episode(self):

@@ -182,6 +182,13 @@ class PointEnv(Environment):
     def close(self):
         """Close the env."""
 
+    def seed(self, seed):
+        """Sets environment seeds.
+        This method should set all seeds specific to the environment library.
+        Args:
+            seed (int): The seed value to set
+        """
+        
     # pylint: disable=no-self-use
     def sample_tasks(self, num_tasks):
         """Sample a list of `num_tasks` tasks.

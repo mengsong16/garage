@@ -184,6 +184,15 @@ class DMControlEnv(Environment):
             self._viewer = DmControlViewer(title=title)
             self._viewer.launch(self._env)
 
+    def seed(self, seed):
+        """Sets all environment seeds.
+        Args:
+            seed (int): The seed value to set
+        """
+        # pylint: disable=protected-access
+        self._env._task._random = np.random.RandomState(seed)
+        self.action_space.seed(seed)
+            
     def close(self):
         """Close the environment."""
         if self._viewer:

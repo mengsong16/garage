@@ -2,7 +2,7 @@
 import akro
 import numpy as np
 
-from garage import EnvStep, Wrapper
+from garage import EnvStep, Wrapper, Environment
 
 
 class NormalizedEnv(Wrapper):
@@ -163,5 +163,13 @@ class NormalizedEnv(Wrapper):
         self._update_reward_estimate(reward)
         return reward / (np.sqrt(self._reward_var) + 1e-8)
 
+    def seed(self, seed):
+        """Sets environment seeds.
+        This method should set all seeds specific to the environment library.
+        Args:
+            seed (int): The seed value to set
+        """
+        assert isinstance(self._env, Environment)
+        self._env.seed(seed)
 
 normalize = NormalizedEnv

@@ -65,6 +65,11 @@ class WorkerFactory:
         else:
             self._worker_args = worker_args
 
+        #print('--------Worker factory: initialize--------')
+        #print("self seed: %d"%(self._seed) )
+        #print('-----------------------------------------')  
+      
+
     def prepare_worker_messages(self, objs, preprocess=identity_function):
         """Take an argument and canonicalize it into a list for all workers.
 

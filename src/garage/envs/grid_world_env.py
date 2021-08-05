@@ -213,3 +213,10 @@ class GridWorldEnv(Environment):
             return [(state, 1.)]
         else:
             return [(next_state, 1.)]
+
+    def seed(self, seed):
+        """Sets environment seeds.
+        This method should set all seeds specific to the environment library.
+        Args:
+            seed (int): The seed value to set
+        """        

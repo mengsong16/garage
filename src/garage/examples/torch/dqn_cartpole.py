@@ -19,7 +19,7 @@ from garage.trainer import Trainer
 
 @click.command()
 @click.option('--seed', default=24)
-@wrap_experiment(snapshot_mode='none')
+@wrap_experiment(snapshot_mode='last')
 def dqn_cartpole(ctxt=None, seed=24):
     """Train DQN with CartPole-v0 environment.
 
@@ -32,11 +32,15 @@ def dqn_cartpole(ctxt=None, seed=24):
     set_seed(seed)
     runner = Trainer(ctxt)
 
-    n_epochs = 100
+    n_epochs = 10 #10 #100
     steps_per_epoch = 10
     sampler_batch_size = 512
     num_timesteps = n_epochs * steps_per_epoch * sampler_batch_size
     env = GymEnv('CartPole-v0')
+    #print("==========================")
+    #print("Seeding environment")
+    #env.seed(seed)
+    #print("==========================")
     replay_buffer = PathBuffer(capacity_in_transitions=int(1e6))
     qf = DiscreteMLPQFunction(env_spec=env.spec, hidden_sizes=(8, 5))
     policy = DiscreteQFArgmaxPolicy(env_spec=env.spec, qf=qf)
@@ -49,7 +53,8 @@ def dqn_cartpole(ctxt=None, seed=24):
     sampler = LocalSampler(agents=exploration_policy,
                            envs=env,
                            max_episode_length=env.spec.max_episode_length,
-                           worker_class=FragmentWorker)
+                           worker_class=FragmentWorker,
+                           n_workers=1)
     algo = DQN(env_spec=env.spec,
                policy=policy,
                qf=qf,

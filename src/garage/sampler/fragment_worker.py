@@ -50,6 +50,8 @@ class FragmentWorker(DefaultWorker):
         # Initialized in start_episode
         self._fragments = None
 
+        print("self seed: %d"%(self._seed) )
+
     def update_env(self, env_update):
         """Update the environments.
 
@@ -78,9 +80,11 @@ class FragmentWorker(DefaultWorker):
                 copy.deepcopy(env_update) for _ in range(self._n_envs)
             ]
         if env_update:
+            print("self seed: %d"%(self._seed) )
+            print("self worker_number: %d"%(self._worker_number) )
             for env_index, env_up in enumerate(env_update):
                 self._envs[env_index], up = _apply_env_update(
-                    self._envs[env_index], env_up)
+                    self._envs[env_index], env_up, self._seed + self._worker_number)
                 self._needs_env_reset |= up
 
     def start_episode(self):

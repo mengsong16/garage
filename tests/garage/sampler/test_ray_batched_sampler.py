@@ -10,7 +10,8 @@ from garage.envs.grid_world_env import GridWorldEnv
 from garage.experiment.task_sampler import SetTaskSampler
 from garage.np.policies import FixedPolicy, ScriptedPolicy
 from garage.sampler import LocalSampler, RaySampler, WorkerFactory
-
+from garage.envs import GymEnv
+from garage.envs.dm_control import DMControlEnv
 from tests.fixtures.sampler import ray_local_session_fixture
 
 
@@ -53,7 +54,51 @@ def test_obtain_samples(ray_local_session_fixture):
     sampler2.shutdown_worker()
     env.close()
 
+def test_deterministic_on_policy_ray_sampling_gym_env():
+    max_episode_length = 10
+    env1 = GymEnv('LunarLander-v2')
+    env2 = GymEnv('LunarLander-v2')
+    # Fix the action sequence
+    env1.action_space.seed(10)
+    env2.action_space.seed(10)
+    policy1 = FixedPolicy(env1.spec,
+                          scripted_actions=[
+                              env1.action_space.sample()
+                              for _ in range(max_episode_length)
+                          ])
+    policy2 = FixedPolicy(env2.spec,
+                          scripted_actions=[
+                              env2.action_space.sample()
+                              for _ in range(max_episode_length)
+                          ])
+    n_workers = 2
+    worker1 = WorkerFactory(seed=10,
+                            max_episode_length=max_episode_length,
+                            n_workers=n_workers)
+    worker2 = WorkerFactory(seed=10,
+                            max_episode_length=max_episode_length,
+                            n_workers=n_workers)
+    sampler1 = RaySampler.from_worker_factory(worker1, policy1, env1)
+    sampler2 = RaySampler.from_worker_factory(worker2, policy2, env2)
+    episodes1 = sampler1.obtain_samples(0, 100, policy1)
+    episodes2 = sampler2.obtain_samples(0, 100, policy2)
 
+    start = 0
+    assert np.array_equal(np.array(episodes1.lengths), np.array(episodes2.lengths))
+    for length in episodes1.lengths:
+        assert np.array_equal(episodes1.observations[start:start + length], episodes2.observations[start:start + length])
+        assert np.array_equal(episodes1.next_observations[start:start + length], episodes2.next_observations[start:start + length])
+        start += length 
+
+    sampler1.shutdown_worker()
+    sampler2.shutdown_worker()
+    env1.close()
+    env2.close()                     
+
+    print("------------------------------------------------------")
+    print("Succeed: test_deterministic_on_policy_ray_sampling_gym_env")                       
+    print("------------------------------------------------------")
+    
 def test_update_envs_env_update(ray_local_session_fixture):
     del ray_local_session_fixture
     assert ray.is_initialized()
@@ -159,3 +204,5 @@ def test_init_without_worker_factory(ray_local_session_fixture):
             worker_factory._max_episode_length)
     with pytest.raises(TypeError, match='Must construct a sampler from'):
         RaySampler(agents=policy, envs=env)
+
+test_deterministic_on_policy_ray_sampling_gym_env()

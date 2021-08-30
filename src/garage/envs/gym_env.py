@@ -294,6 +294,8 @@ class GymEnv(Environment):
         Args:
             seed (int): The seed value to set
         """
+
+        #print("------------------------------- Setting seed -------------------------------")
         self._env.seed(seed)
         self.action_space.seed(seed)
         
@@ -317,6 +319,9 @@ class GymEnv(Environment):
         # We need to do some strange things here to fix-up flaws in gym
         # pylint: disable=import-outside-toplevel
         if hasattr(self._env, 'spec') and self._env.spec:
+            if getattr(self._env.spec, 'entry_point', '') is None:
+                return
+
             if any(package in getattr(self._env.spec, 'entry_point', '')
                    for package in KNOWN_GYM_NOT_CLOSE_MJ_VIEWER):
                 # This import is not in the header to avoid a MuJoCo dependency
@@ -328,6 +333,7 @@ class GymEnv(Environment):
                     # If we can't import mujoco_py, we must not have an
                     # instance of a class that we know how to close here.
                     return
+  
                 if (hasattr(self._env, 'viewer')
                         and isinstance(self._env.viewer, MjViewer)):
                     glfw.destroy_window(self._env.viewer.window)

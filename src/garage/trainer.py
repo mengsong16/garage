@@ -252,6 +252,7 @@ class Trainer:
 
         """
         eps = self.obtain_episodes(itr, batch_size, agent_update, env_update)
+
         return eps.to_list()
 
     def save(self, epoch):

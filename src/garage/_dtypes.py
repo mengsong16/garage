@@ -1037,18 +1037,20 @@ def check_timestep_batch(batch, array_type, ignored_fields=()):
                     f'{field} has batch size {value.shape[0]}, but '
                     f'must have batch size {inferred_batch_size} '
                     f'to match {inferred_batch_size_field}')
-            if env_spec and field in ['observations', 'next_observations']:
-                if not _space_soft_contains(env_spec.observation_space,
-                                            value[0]):
-                    raise ValueError(
-                        f'Each {field[:-1]} has shape {value[0].shape} '
-                        f'but must match the observation_space '
-                        f'{env_spec.observation_space}')
-                if (isinstance(value[0], np.ndarray)
-                        and not env_spec.observation_space.contains(value[0])):
-                    warnings.warn(
-                        f'Observation {value[0]!r} is outside '
-                        f'observation_space {env_spec.observation_space}')
+            # Do not check the inconsistancy between observations, next_observations and the observation space for dict        
+            # if env_spec and field in ['observations', 'next_observations']:
+            #     if not _space_soft_contains(env_spec.observation_space,
+            #                                 value[0]):
+            #         raise ValueError(
+            #             f'Each {field[:-1]} has shape {value[0].shape} '
+            #             f'but must match the observation_space '
+            #             f'{env_spec.observation_space}')        
+                 
+            #     if (isinstance(value[0], np.ndarray)
+            #             and not env_spec.observation_space.contains(value[0])):
+            #         warnings.warn(
+            #             f'Observation {value[0]!r} is outside '
+            #             f'observation_space {env_spec.observation_space}')
             if env_spec and field == 'actions':
                 if not _space_soft_contains(env_spec.action_space, value[0]):
                     raise ValueError(

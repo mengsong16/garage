@@ -66,4 +66,12 @@ class DiscreteQFArgmaxPolicy(Policy):
             dict: Empty since this policy does not produce a distribution.
         """
         with torch.no_grad():
+            if not isinstance(observations[0], np.ndarray) and not isinstance(observations[0], torch.Tensor):
+                #print(type(observations[0]))
+                #print(observations[0].keys())
+                #print(self._env_spec.observation_space)
+                #print(observations[0])
+                observations = self._env_spec.observation_space.flatten_n(observations)
+                #print(observations.shape)
+
             return self(np_to_torch(observations)).cpu().numpy(), dict()

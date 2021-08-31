@@ -96,6 +96,7 @@ class PathBuffer:
         self._transitions_stored = min(self._capacity,
                                        self._transitions_stored + path_len)
 
+    # never been called
     def sample_path(self):
         """Sample a single path from the buffer.
 
@@ -111,6 +112,7 @@ class PathBuffer:
         path = {key: buf_arr[indices] for key, buf_arr in self._buffer.items()}
         return path
 
+    # for learning
     def sample_transitions(self, batch_size):
         """Sample a batch of transitions from the buffer.
 

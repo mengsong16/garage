@@ -51,6 +51,7 @@ class FragmentWorker(DefaultWorker):
         self._fragments = None
 
         #print("self seed: %d"%(self._seed) )
+        #print(self._max_episode_length)
 
     def update_env(self, env_update):
         """Update the environments.

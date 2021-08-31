@@ -125,7 +125,8 @@ class MyHERReplayBuffer(PathBuffer):
         #print(path)
         #print('-------------------')
         for idx in range(path['actions'].shape[0] - 1):
-            print("-----here-----")
+            #print("-----here-----")
+            #print(path['actions'].shape[0])
 
             transition = {key: sample[idx] for key, sample in path.items()}
             her_goals = self._sample_her_goals(path, idx)
